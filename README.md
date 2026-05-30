@@ -1,194 +1,146 @@
-## Why
+# 🌙 openai-gemini
 
-The Gemini API has [Free](https://ai.google.dev/gemini-api/docs/pricing#free) Tier
-with *generous limits*, but there are still many tools that work exclusively with the OpenAI API.
+将 Google Gemini API 转换为 OpenAI 兼容格式的代理服务，**支持多种部署平台**。
 
-This project provides a personal OpenAI-compatible endpoint for free.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/21967201/openai-gemini)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/21967201/openai-gemini)
 
+## ✨ 特性
 
-## Serverless?
+- 🌐 **多平台支持**: Vercel、Netlify、Cloudflare Workers、Deno、Bun、Node.js
+- 🚀 **免费部署**: 利用各平台的免费额度
+- 🔄 **OpenAI 兼容**: 可直接用于 Open WebUI、Chatbox 等客户端
+- 📊 **流式输出**: 支持 \stream: true\
+- 🔒 **安全**: API Key 通过环境变量管理
 
-Although it runs in the cloud, it does not require server maintenance.
-It can be easily deployed to various providers for free
-(with generous limits suitable for personal use).
+## 🚀 快速部署
 
-> [!TIP]
-> Running the proxy endpoint locally is also an [option](#serve-locally---with-node-deno-bun)!
+### 方法 1: Vercel 一键部署
 
+点击上方 "Deploy with Vercel" 按钮，按照提示操作。
 
-## How to start
+\\\ash
+# 或使用 CLI
+vercel deploy
 
-You will need a personal Google [API key](https://aistudio.google.com/app/api-keys).
+# 本地开发
+vercel dev
+\\\
 
-> [!IMPORTANT]
-> Even if you are located outside of the [supported regions](https://ai.google.dev/gemini-api/docs/available-regions#available_regions),
-> it is still possible to acquire one using a VPN.
+### 方法 2: Netlify 一键部署
 
-Deploy the project to one of the providers, using the instructions below.
-You will need to set up an account there.
+点击上方 "Deploy to Netlify" 按钮。
 
-If you opt for “button-deploy”, you'll be guided through the process of forking the repository first,
-which is necessary for continuous integration (CI).
+\\\ash
+# 或使用 CLI
+netlify deploy
 
+# 本地开发
+netlify dev
+\\\
 
-### Deploy with Vercel
+### 方法 3: Cloudflare Workers
 
- [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/PublicAffairs/openai-gemini&repository-name=my-openai-gemini)
-- Alternatively can be deployed with [cli](https://vercel.com/docs/cli):
-  `vercel deploy`
-- Serve locally: `vercel dev`
-- Vercel _Functions_ [limitations](https://vercel.com/docs/functions/limitations) (with _Edge_ runtime)
+\\\ash
+npm install -g wrangler
+wrangler secret put GEMINI_API_KEY
+wrangler deploy
+\\\
 
+### 方法 4: 本地运行（Node/Deno/Bun）
 
-### Deploy to Netlify
+\\\ash
+# Node.js
+npm install
+node node.mjs
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/PublicAffairs/openai-gemini&integrationName=integrationName&integrationSlug=integrationSlug&integrationDescription=integrationDescription)
-- Alternatively can be deployed with [cli](https://docs.netlify.com/cli/get-started/):
-  `netlify deploy`
-- Serve locally: `netlify dev`
-- Two different api bases provided:
-  - `/v1` (e.g. `/v1/chat/completions` endpoint)  
-    _Functions_ [limits](https://docs.netlify.com/build/functions/get-started/#synchronous-function)
-  - `/edge/v1`  
-    _Edge functions_ [limits](https://docs.netlify.com/build/edge-functions/limits/)
+# Deno
+deno run --allow-env --allow-net deno.mjs
 
+# Bun
+bun run bun.mjs
+\\\
 
-### Deploy to Cloudflare
+## 🔧 环境变量
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/PublicAffairs/openai-gemini)
-- Alternatively can be deployed manually pasting content of [`src/worker.mjs`](src/worker.mjs)
-  to https://workers.cloudflare.com/playground (see there `Deploy` button).
-- Alternatively can be deployed with [cli](https://developers.cloudflare.com/workers/wrangler/):
-  `wrangler deploy`
-- Serve locally: `wrangler dev`
-- _Worker_ [limits](https://developers.cloudflare.com/workers/platform/limits/#worker-limits)
+| 变量 | 必填 | 说明 |
+|------|------|------|
+| \GEMINI_API_KEY\ | ✅ | Google Gemini API Key（从 [AI Studio](https://aistudio.google.com/app/apikey) 获取） |
 
+## 📖 使用方法
 
-### Deploy to Deno
+### 在 Open WebUI 中使用
 
-See details [here](https://github.com/PublicAffairs/openai-gemini/discussions/19).
+\\\ash
+docker run -d -p 3000:8080 \\
+  -e OPENAI_API_BASE_URL=https://你的域名.vercel.app/v1 \\
+  -e OPENAI_API_KEY=任意值 \\
+  --name open-webui \\
+  ghcr.io/open-webui/open-webui:main
+\\\
 
+### API 调用示例
 
-### Serve locally - with Node, Deno, Bun
+\\\ash
+# 非流式请求
+curl https://你的域名.vercel.app/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "gemini-pro",
+    "messages": [{"role": "user", "content": "Hello!"}],
+    "stream": false
+  }'
 
-Only for Node: `npm install`.
+# 流式请求
+curl https://你的域名.vercel.app/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "gemini-pro",
+    "messages": [{"role": "user", "content": "Hello!"}],
+    "stream": true
+  }'
+\\\
 
-Then `npm run start` / `npm run start:deno` / `npm run start:bun`.
+## 📁 项目结构
 
+\\\
+├── api/                   # Vercel/Netlify 函数
+├── src/                   # 源代码
+├── public/                # 静态资源
+├── node.mjs               # Node.js 入口
+├── deno.mjs               # Deno 入口
+├── bun.mjs                # Bun 入口
+├── wrangler.toml          # Cloudflare 配置
+├── vercel.json            # Vercel 配置
+├── netlify.toml          # Netlify 配置
+└── README.md
+\\\
 
-#### Dev mode (watch source changes)
+## 🌍 支持的平台
 
-Only for Node: `npm install --include=dev`
+- ✅ **Vercel** (推荐)
+- ✅ **Netlify**
+- ✅ **Cloudflare Workers**
+- ✅ **Deno Deploy**
+- ✅ **Bun**
+- ✅ **Node.js**
 
-Then: `npm run dev` / `npm run dev:deno` / `npm run dev:bun`.
+## 🤝 贡献
 
+欢迎提交 Issue 和 Pull Request！
 
-## How to use
-If you open your newly-deployed site in a browser, you will only see a `404 Not Found` message. This is expected, as the API is not designed for direct browser access.
-To utilize it, you should enter your API address and your Gemini API key into the corresponding fields in your software settings.
+## 📝 许可证
 
-> [!NOTE]
-> Not all software tools allow overriding the OpenAI endpoint, but many do
-> (however these settings can sometimes be deeply hidden).
+详见 [LICENSE](LICENSE) 文件。
 
-Typically, you should specify the API base in this format:  
-`https://my-super-proxy.vercel.app/v1`
+## 🙏 致谢
 
-The relevant field may be labeled as "_OpenAI proxy_".
-You might need to look under "_Advanced settings_" or similar sections.
-Alternatively, it could be in some config file (check the relevant documentation for details).
-
-For some command-line tools, you may need to set an environment variable, _e.g._:
-```sh
-OPENAI_BASE_URL="https://my-super-proxy.vercel.app/v1"
-```
-_..or_:
-```sh
-OPENAI_API_BASE="https://my-super-proxy.vercel.app/v1"
-```
-
-
-## Models
-
-Requests use the specified [model] if its name starts with "gemini-", "gemma-", or "models/".
-Otherwise, these defaults apply:
-
-- `chat/completions`: `gemini-flash-latest`
-- `embeddings`: `gemini-embedding-001`
-
-[model]: https://ai.google.dev/gemini-api/docs/models
-
-
-## Built-in tools
-
-To use the **web search** tool, append ":search" to the model name
-(e.g., "gemini-2.5-flash:search").
-
-Note: The `annotations` message property is not implemented.
-
-
-## Media
-
-[Vision] and [audio] input supported as per OpenAI [specs].
-Implemented via [`inlineData`](https://ai.google.dev/api/caching#Part).
-
-[vision]: https://platform.openai.com/docs/guides/images-vision?api-mode=chat&format=url#giving-a-model-images-as-input
-[audio]: https://platform.openai.com/docs/guides/audio?example=audio-in&lang=curl#add-audio-to-your-existing-application
-[specs]: https://platform.openai.com/docs/api-reference/chat/create
-
-
-## Gemini-specific functions
-
-There are several features supported by Gemini that are not available in OpenAI models
-but can be enabled using the `extra_body` field.
-The most notable of these is [`thinking_config`](https://ai.google.dev/gemini-api/docs/openai#thinking).
-
-For more details, refer to the [Gemini API docs](https://ai.google.dev/gemini-api/docs/openai#extra-body).
+- [Google Gemini API](https://ai.google.dev/)
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
 
 ---
 
-## Supported API endpoints and applicable parameters
+**维护者**: [@21967201](https://github.com/21967201)  
+**原始项目**: [PublicAffairs/openai-gemini](https://github.com/PublicAffairs/openai-gemini)
 
-- [x] `chat/completions`
-
-  Currently, most of the parameters that are applicable to both APIs have been implemented.
-  <details>
-
-  - [x] `messages`
-      - [x] `content`
-      - [x] `role`
-          - [x] "system" (=>`system_instruction`)
-          - [x] "user"
-          - [x] "assistant"
-          - [x] "tool"
-      - [x] `tool_calls`
-  - [x] `model`
-  - [x] `frequency_penalty`
-  - [ ] `logit_bias`
-  - [ ] `logprobs`
-  - [ ] `top_logprobs`
-  - [x] `max_tokens`, `max_completion_tokens`
-  - [x] `n` (`candidateCount` <8, not for streaming)
-  - [x] `presence_penalty`
-  - [x] `reasoning_effort`
-  - [x] `response_format`
-      - [x] "json_object"
-      - [x] "json_schema" (a select subset of an OpenAPI 3.0 schema object)
-      - [x] "text"
-  - [x] `seed`
-  - [x] `stop`: string|array (`stopSequences` [1,5])
-  - [x] `stream`
-  - [x] `stream_options`
-      - [x] `include_usage`
-  - [x] `temperature` (0.0..2.0 for OpenAI, but Gemini supports up to infinity)
-  - [x] `top_p`
-  - [x] `tools`
-  - [x] `tool_choice`
-  - [ ] `parallel_tool_calls` (is always active in Gemini)
-  - [x] [`extra_body`](#gemini-specific-functions)
-
-  </details>
-- [ ] `completions`
-- [x] `embeddings`
-  - [x] `dimensions`
-- [x] `models`
+⭐ 如果这个项目对你有帮助，请给它一个 Star！
