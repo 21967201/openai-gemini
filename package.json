@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@whatwg-node/server": "0.9"
+    "@whatwg-node/server": "^0.13.3"
   },
   "devDependencies": {
     "nodemon": "3",
